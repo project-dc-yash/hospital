@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health IoT Pro - Integrated System</title>
+    <style>
+        /* --- GLOBAL STYLES --- */
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #2ecc71;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        
+        body { 
+            display: flex; 
+            background-color: var(--bg); 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar { 
+            width: 260px; 
+            background-color: var(--primary); 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 { font-size: 22px; margin-bottom: 30px; color: var(--accent); text-align: center; border-bottom: 1px solid #34495e; padding-bottom: 15px; }
+        
+        .sidebar-menu { list-style: none; flex-grow: 1; }
+        
+        .sidebar-menu li { 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .sidebar-menu li:hover, .sidebar-menu li.active { 
+            background: #34495e; 
+            color: var(--accent); 
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        
+        .navbar { 
+            height: 70px; 
+            background: var(--white); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 30px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .panel { display: none; padding: 25px; animation: fadeIn 0.4s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- UI COMPONENTS --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        
+        .card { 
+            background: var(--white); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            border-top: 4px solid var(--accent);
+        }
+
+        .card h3 { color: #7f8c8d; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .value { font-size: 36px; font-weight: bold; color: var(--primary); }
+        .unit { font-size: 18px; color: #95a5a6; }
+
+        /* Status & Badges */
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .bg-normal { background: #d4edda; color: #155724; }
+        .bg-warning { background: #fff3cd; color: #856404; }
+        .bg-danger { background: #f8d7da; color: #721c24; }
+
+        /* Progress Bars */
+        .progress-container { background: #eee; height: 12px; border-radius: 6px; margin: 10px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--accent); transition: width 0.5s; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 10px; overflow: hidden; }
+        th { text-align: left; background: #f8f9fa; padding: 15px; color: #2c3e50; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+
+        /* Hospital Specific */
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f1f1; }
+        .facility-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>HEALTH IOT PRO</h2>
+        <ul class="sidebar-menu">
+            <li id="btn-hospital" class="active" onclick="showPanel('hospital')">🏥 Hospital Dash</li>
+            <li id="btn-patient" onclick="showPanel('patient')">👤 Patient Portal</li>
+            <li id="btn-logs" onclick="showPanel('logs')">📊 History Logs</li>
+            <li style="margin-top: auto; color: var(--danger);">🚪 Logout</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="navbar">
+            <h3 id="nav-title">Hospital Overview</h3>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="color: var(--success); font-size: 14px;">● ESP32 Connected</span>
+                <strong style="font-size: 14px;">User: Admin_01</strong>
+            </div>
+        </div>
+
+        <div id="hospital" class="panel active">
+            <div class="grid">
+                <div class="card" style="grid-column: span 2; border-color: var(--primary);">
+                    <h3>Hospital Information</h3>
+                    <div class="info-row">
+                        <span><strong>Name:</strong> City Life Multi-Specialty</span>
+                        <span><b class="badge bg-normal">Premium Provider</b></span>
+                    </div>
+                    <div class="info-row">
+                        <span><strong>Address:</strong> 78 Health St, Medical District</span>
+                        <span><strong>Contact:</strong> +91 9900-1122</span>
+                    </div>
+                    <div class="info-row" style="margin-top: 10px; border: none;">
+                        <div>🛡️ <b>Safety:</b> Fire Safety (OK), Waste Mgmt (OK)</div>
+                    </div>
+                </div>
+
+                <div class="card" style="border-color: var(--accent);">
+                    <h3>💨 Oxygen Supply (O2)</h3>
+                    <div class="value">88 <small class="unit">PSI</small></div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 88%; background: var(--accent);"></div>
+                    </div>
+                    <small>Tank Status: High Pressure</small>
+                </div>
+
+                <div class="card" style="border-color: var(--danger);">
+                    <h3>🚨 Emergency Room (ER)</h3>
+                    <div class="value">03 <small class="unit">Free Beds</small></div>
+                    <p style="color: var(--danger); font-size: 12px; font-weight: bold;">Status: Critical Load</p>
+                </div>
+
+                <div class="card">
+                    <h3>🛠️ Facilities</h3>
+                    <ul class="facility-list">
+                        <li>✅ 24/7 Pharmacy</li>
+                        <li>✅ MRI / CT Scan</li>
+                        <li>✅ Blood Bank</li>
+                        <li>✅ ICU / NICU</li>
+                        <li>✅ Ambulance</li>
+                        <li>✅ Trauma Care</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>👨‍⚕️ Available Doctors</h3>
+                    <div class="info-row"><small>Dr. Kapoor (Cardio)</small><small>Available</small></div>
+                    <div class="info-row"><small>Dr. Verma (Neuro)</small><small>04:00 PM</small></div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div id="patient" class="panel">
+            <div class="grid">
+                <div class="card">
+                    <h3>Heart Beat</h3>
+                    <div id="heart-val" class="value" style="color: var(--danger);">72 <small class="unit">BPM</small></div>
+                </div>
+                <div class="card">
+                    <h3>SpO2 (Oxygen)</h3>
+                    <div id="spo2-val" class="value" style="color: var(--accent);">98 <small class="unit">%</small></div>
+                </div>
+                <div class="card">
+                    <h3>Body Temp</h3>
+                    <div class="value" style="color: var(--warning);">36.5 <small class="unit">°C</small></div>
+                </div>
+
+                <div id="ai-alert" class="card" style="grid-column: span 3; background: #fffcf0; border-color: var(--warning);">
+                    <h3 id="patient-status-title">Condition: <span id="classification-text">NORMAL</span></h3>
+                    <p id="suggestion-box">All vitals are within normal range. Stay hydrated.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="logs" class="panel">
+            <div class="card" style="width: 100%; border-color: var(--primary);">
+                <h3>Patient Medical Logs</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Heart Rate</th>
+                            <th>SpO2</th>
+                            <th>Classification</th>
+                            <th>Hospital Suggestion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table">
+                        <tr>
+                            <td>10:45 AM</td>
+                            <td>72 BPM</td>
+                            <td>98%</td>
+                            <td><span class="badge bg-normal">Normal</span></td>
+                            <td>None Required</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching Logic
+        function showPanel(panelId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            document.getElementById('btn-' + panelId).classList.add('active');
+
+            const titles = { hospital: "Hospital Overview", patient: "User Monitoring Portal", logs: "Medical History Logs" };
+            document.getElementById('nav-title').innerText = titles[panelId];
+        }
+
+        // Live Data Simulation & Classification Logic (The "Checking" point in your notes)
+        setInterval(() => {
+            const heart = Math.floor(Math.random() * (115 - 65)) + 65;
+            const spo2 = Math.floor(Math.random() * (100 - 90)) + 90;
+            
+            document.getElementById('heart-val').innerHTML = `${heart} <small class="unit">BPM</small>`;
+            document.getElementById('spo2-val').innerHTML = `${spo2} <small class="unit">%</small>`;
+
+            const alertBox = document.getElementById('ai-alert');
+            const classText = document.getElementById('classification-text');
+            const suggest = document.getElementById('suggestion-box');
+
+            if(heart > 100 || spo2 < 92) {
+                classText.innerText = "CRITICAL";
+                alertBox.style.background = "#fdf2f2";
+                alertBox.style.borderColor = "var(--danger)";
+                suggest.innerHTML = "⚠️ <b>Action Required:</b> High vitals detected. Nearest suitable hospital: <b>City Life Hospital (ER Available)</b>.";
+                addLogEntry(heart, spo2, "Critical");
+            } else if (heart > 90) {
+                classText.innerText = "MODERATE";
+                alertBox.style.background = "#fffcf0";
+                alertBox.style.borderColor = "var(--warning)";
+                suggest.innerText = "Vitals are slightly elevated. Rest and re-check in 10 mins.";
+            } else {
+                classText.innerText = "NORMAL";
+                alertBox.style.background = "#f4faf6";
+                alertBox.style.borderColor = "var(--success)";
+                suggest.innerText = "Patient is stable. No action needed.";
+            }
+        }, 4000);
+
+        function addLogEntry(h, s, status) {
+            const table = document.getElementById('log-table');
+            const row = table.insertRow(0);
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const badgeClass = status === "Critical" ? "bg-danger" : "bg-normal";
+            
+            row.innerHTML = `
+                <td>${time}</td>
+                <td>${h} BPM</td>
+                <td>${s}%</td>
+                <td><span class="badge ${badgeClass}">${status}</span></td>
+                <td>${status === 'Critical' ? 'City Life (ER)' : 'N/A'}</td>
+            `;
+            if(table.rows.length > 10) table.deleteRow(10);
+        }
+    </script>
+</body>
+</html>
